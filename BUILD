@@ -6,7 +6,7 @@ cc_library(
         "include/deheap/deheap.hpp",
         "include/deheap/deheap.ipp",
     ],
-    strip_include_prefix = "include",
+    includes = ["include"],
     visibility = ["//visibility:public"],
     deps = [":functions"],
 )
@@ -17,6 +17,6 @@ cc_library(
         "include/deheap/functions.hpp",
         "include/deheap/functions.ipp",
     ],
-    strip_include_prefix = "include",
+    includes = ["include"],
     visibility = ["//visibility:public"],
 )

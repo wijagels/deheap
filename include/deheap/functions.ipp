@@ -163,4 +163,14 @@ RandomIt get_max(RandomIt first, RandomIt last) {
   return largest;
 }
 
+template <typename RandomIt>
+void sort_deheap_descending(RandomIt first, RandomIt last) {
+  while (first != last) pop_min(first, last--);
+}
+
+template <typename RandomIt>
+void sort_deheap_ascending(RandomIt first, RandomIt last) {
+  while (first != last) pop_max(first, last--);
+}
+
 }  // namespace deheap

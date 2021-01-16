@@ -40,4 +40,4 @@ class deheap_queue {
 
 }  // namespace deheap
 
-#include "deheap/deheap.ipp"
+#include "deheap.ipp"

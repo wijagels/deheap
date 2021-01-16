@@ -1,6 +1,6 @@
 #pragma once
 
-#include "deheap/functions.hpp"
+#include "functions.hpp"
 
 namespace deheap {
 

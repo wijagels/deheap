@@ -25,6 +25,14 @@ void check_invariant(RandomIt first, RandomIt last) {
     EXPECT_EQ(*(first + 1), max);
   }
 }
+
+void create_random_deheap(std::vector<int> &v, size_t size = 100000) {
+  v.reserve(size);
+  std::uniform_int_distribution<> dis{0, 1 << 18};
+  std::mt19937 gen;
+  std::generate_n(std::back_inserter(v), size, [&]() { return dis(gen); });
+  make_deheap(v.begin(), v.end());
+}
 }  // namespace
 
 TEST(Functions, push_deheap) {
@@ -89,13 +97,9 @@ TEST(Functions, make_deheap) {
 }
 
 TEST(Functions, make_deheap_big) {
-  const int test_size = 100000;
   std::vector<int> v;
-  v.reserve(test_size);
-  std::uniform_int_distribution<> dis{0, 1 << 18};
+  create_random_deheap(v);
   std::mt19937 gen;
-  std::generate_n(std::back_inserter(v), test_size, [&]() { return dis(gen); });
-  make_deheap(v.begin(), v.end());
 
   while (!v.empty()) {
     int min = v.front();
@@ -110,4 +114,14 @@ TEST(Functions, make_deheap_big) {
     v.pop_back();
     check_invariant(v.begin(), v.end());
   }
+}
+
+TEST(Functions, sorting) {
+  std::vector<int> v1;
+  create_random_deheap(v1);
+  auto v2 = v1;
+  sort_deheap_ascending(v1.begin(), v1.end());
+  EXPECT_TRUE(std::is_sorted(v1.begin(), v1.end()));
+  sort_deheap_descending(v2.begin(), v2.end());
+  EXPECT_TRUE(std::is_sorted(v2.begin(), v2.end(), std::greater<int>{}));
 }
