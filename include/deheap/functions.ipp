@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <iterator>
+#include <type_traits>
 #include <utility>
 
 namespace deheap {
@@ -47,25 +48,24 @@ template <typename RandomIt, typename Compare>
 void sift_down(RandomIt first, RandomIt last, RandomIt pos, Compare comp) {
   using std::swap;
   // Maintain C++11 compatibility and no <tuple>
-  Children<RandomIt> ch;
-  Children<RandomIt> lc;
-  Children<RandomIt> rc;
   RandomIt ch1, ch2;
   RandomIt gc1, gc2, gc3, gc4;
-  ch = get_children(first, pos);
+  auto ch = get_children(first, pos);
   ch1 = ch.ch1;
   ch2 = ch.ch2;
   if (ch1 >= last) return;
-  lc = get_children(first, ch1);
+  auto lc = get_children(first, ch1);
   gc1 = lc.ch1;
   gc2 = lc.ch2;
-  rc = get_children(first, ch2);
+  auto rc = get_children(first, ch2);
   gc3 = rc.ch1;
   gc4 = rc.ch2;
 
   RandomIt smallest = pos;
-  for (RandomIt candidate : {ch1, ch2, gc1, gc2, gc3, gc4})
-    if (candidate < last && comp(*candidate, *smallest)) smallest = candidate;
+  for (RandomIt candidate : {ch1, ch2, gc1, gc2, gc3, gc4}) {
+    if (candidate >= last) break;
+    if (comp(*candidate, *smallest)) smallest = candidate;
+  }
 
   if (smallest != pos) {
     if (smallest == ch1 || smallest == ch2) {
@@ -94,29 +94,31 @@ void sift_up(RandomIt first, RandomIt last, RandomIt pos, Compare comp) {
 
 template <typename RandomIt>
 void sift_down(RandomIt first, RandomIt last, RandomIt pos) {
+  using T = typename std::remove_reference<decltype(*pos)>::type;
   if (get_level(first, pos) % 2 == 0)
-    sift_down(first, last, pos, std::less<decltype(*pos)>{});
+    sift_down(first, last, pos, std::less<T>{});
   else
-    sift_down(first, last, pos, std::greater<decltype(*pos)>{});
+    sift_down(first, last, pos, std::greater<T>{});
 }
 
 template <typename RandomIt>
 void sift_up(RandomIt first, RandomIt last, RandomIt pos) {
   using std::swap;
+  using T = typename std::remove_reference<decltype(*pos)>::type;
   auto parent = get_parent(first, pos);
   if (get_level(first, pos) % 2 == 0) {
     if (pos != first && *pos > *parent) {
       swap(*pos, *parent);
-      sift_up(first, last, parent, std::greater<decltype(*pos)>{});
+      sift_up(first, last, parent, std::greater<T>{});
     } else {
-      sift_up(first, last, pos, std::less<decltype(*pos)>{});
+      sift_up(first, last, pos, std::less<T>{});
     }
   } else {
     if (pos != first && *pos < *parent) {
       swap(*pos, *parent);
-      sift_up(first, last, parent, std::less<decltype(*pos)>{});
+      sift_up(first, last, parent, std::less<T>{});
     } else {
-      sift_up(first, last, pos, std::greater<decltype(*pos)>{});
+      sift_up(first, last, pos, std::greater<T>{});
     }
   }
 }
